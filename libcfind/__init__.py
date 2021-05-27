@@ -118,7 +118,7 @@ class  finder(object):
 					    break
 					except:
 					    continue
-				return oggls
+				return oggls+self.libcbase
 
 if __name__ == "__main__":
 	
