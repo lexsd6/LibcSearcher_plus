@@ -1,6 +1,17 @@
 ## 简介
 
 项目[LibcSearcher](https://github.com/lieanu/LibcSearcher)项目所启发优化而来的项目。为解决LibcSearcher使用过程琐杂，在写沉余重复代码浪费时间的问题。优化代码部分逻辑，使在使用更便捷的基础上，添加one_gatge查询功能。
+## 环境依赖
+
+本项目依赖以下项目与环境:
+
+[libc-database](https://github.com/niklasb/libc-database)提供libc
+
+[one_gadget](https://github.com/david942j/one_gadget)项目来查询`execve('/bin/sh', NULL, NULL)`
+
+ruby 环境,推荐2.6版本环境([one_gadget](https://github.com/david942j/one_gadget)项目依赖这个环境)
+
+python2/3
 
 ## 安装
 
