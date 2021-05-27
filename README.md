@@ -21,11 +21,12 @@ python2/3
 sudo git clone https://github.com/lexsd6/LibcSearcher_plus.git
 cd ./LibcSearcher_plus
 sudo chmod 777 ./setup.py #远程仓库文件权限问题
-sudo git clone https://github.com/niklasb/libc-database.git
+sudo git clone https://github.com/niklasb/libc-database.git #若有libc-database ，cp 一份到LibcSearcher_plus目录下
 sudo apt-get install ruby2.6 ruby2.6-dev  #有ruby环境可以跳过
 sudo gem install one_gadget
 sudo ./setup.py develop
-cd ./libc-database
+#若有libc-database 则不需要执行下面，cp本地db即可
+cd ./libc-database         
 sudo ./get ubuntu debian
 ```
 
