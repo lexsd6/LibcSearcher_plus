@@ -25,6 +25,8 @@ sudo git clone https://github.com/niklasb/libc-database.git
 sudo apt-get install ruby2.6 ruby2.6-dev  #有ruby环境可以跳过
 sudo gem install one_gadget
 sudo ./setup.py develop
+cd ./libc-database
+sudo ./get ubuntu debian
 ```
 
 当然也可以执行文件中`./create`脚本文件来代替操作:
