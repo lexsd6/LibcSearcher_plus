@@ -1,6 +1,5 @@
-# LibcSearcher_plus
-Libsearcher improved according to my personal habits.
 ## 简介
+
 项目[LibcSearcher](https://github.com/lieanu/LibcSearcher)项目所启发优化而来的项目。为解决LibcSearcher使用过程琐杂，在写沉余重复代码浪费时间的问题。优化代码部分逻辑，使在使用更便捷的基础上，添加one_gatge查询功能。
 
 ## 安装
@@ -74,14 +73,16 @@ libc_read=x.symbols['read']   #获得read函数在libc中的偏移
 real_read=x.dump('read')  #获得read函数真实地址（基地址+libc中的偏移）
 #同理
 libc_system=x.symbols['system']   #获得system函数在libc中的偏移
+libc__malloc_hook=x.symbols['__malloc_hook']   #获得__malloc_hook在libc中的偏移
 real_str_bin_sh=x.dump('str_bin_sh')  #获得‘/bin/sh’真实地址（基地址+libc中的偏移）
+real_libc_start_main_ret=x.dump('__libc_start_main_ret')  #获得__libc_start_main_ret真实地址（基地址+libc中的偏移）
 ```
 
 
 
 ### one_gadget查询
 
-依赖[one_gadget](https://github.com/david942j/one_gadget)项目的简单one_gadget的偏移查询（返回结果仅仅是int类型的偏移，需手动）
+依赖[one_gadget](https://github.com/david942j/one_gadget)项目的简单one_gadget的偏移查询,返回结果one_gadget的真实地址(基地址+libc中的偏移)
 
 ```python
 x.one_gadget()#即可查询
@@ -120,7 +121,6 @@ constraints:
 [!] you can choose a gadget by hand or type 'exit' to quit:5
 [*] you choose gadget: 0x5fbd6
 ```
-
 
 
 ## 其他
