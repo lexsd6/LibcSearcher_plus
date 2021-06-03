@@ -81,7 +81,9 @@ Or type 'exit' to quit:5
 1.3版新功能：
 ```python
 
-finder('write',0xf7eb4c90,num=1)#优先自动选择标号为1的libc( 既实例上面中的libc6-amd64_2.27-3ubuntu1.2_i386(source from:ubuntu-glibc) )，来代替手动选择。若选取失败再手动选择。 
+finder('write',0xf7eb4c90,num=1)
+#优先自动选择标号为1的libc( 既实例上面中的libc6-amd64_2.27-3ubuntu1.2_i386(source from:ubuntu-glibc) )，
+来代替手动选择。若选取失败再手动选择。 
 ```
 
 ### 地址查询
