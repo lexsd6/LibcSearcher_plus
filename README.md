@@ -78,6 +78,11 @@ Or type 'exit' to quit:5
 ```
 
 同时在选定库后会显示这时libc的基地址。
+1.3版新功能：
+```python
+
+finder('write',0xf7eb4c90,num=1)#优先自动选择标号为1的libc( 既实例上面中的libc6-amd64_2.27-3ubuntu1.2_i386(source from:ubuntu-glibc) )，来代替手动选择。若选取失败再手动选择。 
+```
 
 ### 地址查询
 
@@ -99,8 +104,9 @@ real_libc_start_main_ret=x.dump('__libc_start_main_ret')  #获得__libc_start_ma
 依赖[one_gadget](https://github.com/david942j/one_gadget)项目的简单one_gadget的偏移查询,返回结果one_gadget的真实地址(基地址+libc中的偏移)
 
 ```python
-x.one_gadget()#即可查询
-x.one_gadget(1) #设置查询等级，即 one_gadget --level 1
+x.ogg()#即可查询
+x.ogg(1) #设置查询等级，即 one_gadget --level 1
+x.ogg(num=0)#自动选择标号为0的one_gadget，来代替手动选择。
 ```
 
 有多个one_gadget，会如下提示，手动选择。
@@ -135,7 +141,11 @@ constraints:
 [!] you can choose a gadget by hand or type 'exit' to quit:5
 [*] you choose gadget: 0x5fbd6
 ```
+1.3版新功能：
+```python
 
+x.ogg(num=0)#自动选择标号为0的one_gadget(既实例上面中的0x3ac6c)，来代替手动选择。若选取失败再手动选择。 
+```
 
 ## 其他
 
