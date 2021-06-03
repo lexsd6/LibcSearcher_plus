@@ -6,13 +6,13 @@ import sys
 
 
 class  finder(object):
-	def __init__(self,func=None, addr=None):
+	def __init__(self,func=None, addr=None,num=None):
 		self.symbols={}
 		self.libcbase=None
 		self.__libc_path=os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/")
 		self.__fun_news=defaultdict(int)
 		self.__check(func,addr)
-		self.__search()
+		self.__search(num)
 	
 	def __check(self,func,addr):
 		if  type(func)!= str:
@@ -34,7 +34,7 @@ class  finder(object):
 			funcaddr=self.libcbase+self.symbols[func]
 			return funcaddr
 		
-	def __search(self):
+	def __search(self,num):
 		if self.__fun_news['addr'] and self.__fun_news['func']:
 			reconst=re.compile("^%s .*%x"%(self.__fun_news['func'],self.__fun_news['addr']&0xfff))
 			name=[]
@@ -54,30 +54,37 @@ class  finder(object):
 				print("[x]wrong: No matched, Make sure you supply a valid function name or just add more libc.")
 				return None
 			elif len(libcs)>1:
-				print("multi libc results:")
-				for x in range(len(libcs)):
-					with open(os.path.join(self.__libc_path,libcs[0].rstrip('.symbols')+'.info'), 'r') as f:
-						info=f.read().rstrip('\n')
-					print("[-]%2d: %s(source from:%s)" % (x,libcs[x].rstrip('.symbols'),info))
-				while True:
-						try:						
-							libcs_id = input("you can choose it by hand\nOr type 'exit' to quit:")
-						except:
-								break
-						if libcs_id == "exit" or libcs_id == "quit":
-							sys.exit(0)
-						else:
-							try:
-								libcs_id = int(libcs_id)
-								libcs= libcs[libcs_id]
-								self.__libc_path=os.path.join(self.__libc_path,libcs)
-								self.__bind(libcs)
-								with open(self.__libc_path.rstrip('.symbols')+'.info', 'r') as f:
-									info=f.read().rstrip('\n')
-									print("[+] %s baseaddr=%s (source from:%s)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
-								break
-							except:
-						    		continue			
+				
+					print("multi libc results:")
+					for x in range(len(libcs)):
+						with open(os.path.join(self.__libc_path,libcs[x].rstrip('.symbols')+'.info'), 'r') as f:
+							info=f.read().rstrip('\n')
+						print("[-]%2d: %s(source from:%s)" % (x,libcs[x].rstrip('.symbols'),info))
+					
+					while True:
+								try:	
+									if num==None:					
+										libcs_id = input("[!] you can choose it by hand\nOr type 'exit' to quit:")
+										libcs_id = int(libcs_id)
+									else :
+										libcs_id=num
+										num=None
+								except:
+										break
+								if libcs_id == "exit" or libcs_id == "quit":
+									sys.exit(0)
+								else:
+									try:
+										libcs_id = int(libcs_id)
+										libcs= libcs[libcs_id]
+										self.__libc_path=os.path.join(self.__libc_path,libcs)
+										self.__bind(libcs)
+										with open(self.__libc_path.rstrip('.symbols')+'.info', 'r') as f:
+											info=f.read().rstrip('\n')
+											print("[+] %s baseaddr=%s (source from:%s)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
+										break
+									except:
+											continue		
 			else :
 				libcs=libcs[0]
 				self.__libc_path=os.path.join(self.__libc_path,libcs)
@@ -87,7 +94,7 @@ class  finder(object):
 						info=f.read().rstrip('\n')
 				print("[*] %s baseaddr=%s (source from:%s)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
 				
-	def one_gadget(self,level=0):
+	def ogg(self,level=0,num=None):
 		so_path=self.__libc_path.rstrip('.symbols')+'.so'
 		if os.path.exists(so_path)==False:
 			print("[x]wrong:don't find .so file")
@@ -97,7 +104,7 @@ class  finder(object):
 				x=subprocess.check_output(["one_gadget","--level",str(level),so_path])
 			
 			except FileNotFoundError:
-				print('find out one_gadget')
+				print('[x]find out one_gadget')
 			
 			else:
 				oggtext=x.decode().split('\n\n')
@@ -106,13 +113,18 @@ class  finder(object):
 					print('[*]%2d: %s'%(i,oggtext[i]))
 				while True:
 					try:
-						in_id = input("[!] you can choose a gadget by hand or type 'exit' to quit:")
+						if num==None:
+							in_id = input("[!] you can choose a gadget by hand or type 'exit' to quit:")
+							in_id = int(in_id)
+						else :
+							in_id=num
+							num=None
 					except:
 						break
 					if in_id == "exit" or in_id == "quit":
 					    break
 					try:
-					    in_id = int(in_id)
+					    
 					    oggls = int(oggls[in_id],16)
 					    print('[*] you choose gadget: %s'%(hex(oggls)))
 					    break
@@ -120,11 +132,16 @@ class  finder(object):
 					    continue
 				return oggls+self.libcbase
 
+
 if __name__ == "__main__":
 	
-	x=finder('write',0xf7eb4c90)
-	x.one_gadget()
+	x=finder('write',0xf7eb4c90,num=0)
+	#x.ogg(num=0)
+	x.ogg(num=11)
 	print(x.dump('read'))
 	print(x.libcbase)
-	#print(x.__fun_news)
+	#print(x.sym['read'])
+	print(x.symbols['read'])
+	#test('x')
 	#x.search()
+
