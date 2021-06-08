@@ -9,17 +9,17 @@ class  finder(object):
 	def __init__(self,func=None, addr=None,num=None):
 		self.symbols={}
 		self.libcbase=None
-		self.__libc_path=os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/")
+		self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
 		self.__fun_news=defaultdict(int)
 		self.__check(func,addr)
 		self.__search(num)
 	
 	def __check(self,func,addr):
 		if  type(func)!= str:
-			print("[+]wrong: func name not is string !")
+			print("[x]wrong: func name not is string !")
 			return None
 		if  type(addr)!= int:
-			print("[+]wrong: func address not is int !")
+			print("[x]wrong: func address not is int !")
 			return None
 		self.__fun_news['func']=func
 		self.__fun_news['addr']=addr
@@ -51,7 +51,7 @@ class  finder(object):
 	                    			libcs.append(fname)
 		
 			if len(libcs)== 0:
-				print("[x]wrong: No matched, Make sure you supply a valid function name or just add more libc.")
+				print("[x]wrong: No matched, Make sure you supply a valid function name or add more libc in "+self.__libc_path)
 				return None
 			elif len(libcs)>1:
 				
@@ -97,7 +97,7 @@ class  finder(object):
 	def ogg(self,level=0,num=None):
 		so_path=self.__libc_path.rstrip('.symbols')+'.so'
 		if os.path.exists(so_path)==False:
-			print("[x]wrong:don't find .so file")
+			print("[x]wrong:don't find .so file in "+self.__libc_path)
 			return None
 		else:
 			try:
@@ -135,8 +135,8 @@ class  finder(object):
 
 if __name__ == "__main__":
 	
-	x=finder('write',0xf7eb4c90,num=0)
-	#x.ogg(num=0)
+	x=finder('write',0xf7eb4c90,num=11)
+	x.ogg(num=0)
 	x.ogg(num=11)
 	print(x.dump('read'))
 	print(x.libcbase)
@@ -144,4 +144,3 @@ if __name__ == "__main__":
 	print(x.symbols['read'])
 	#test('x')
 	#x.search()
-
