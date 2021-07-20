@@ -9,18 +9,24 @@ class  finder(object):
 	def __init__(self,func=None, addr=None,num=None):
 		self.symbols={}
 		self.libcbase=None
+		self.run_state=hasattr(__import__('__main__'), '__file__')
 		self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
 		self.__fun_news=defaultdict(int)
 		self.__check(func,addr)
 		self.__search(num)
+	def __wrong(self):
+		if self.run_state:
+			sys.exit(0)
+		else :
+			return None
 	
 	def __check(self,func,addr):
 		if  type(func)!= str:
-			print("[x]wrong: func name not is string !")
-			return None
+			print("[\033[0;31;1mx\033[0m]wrong: func name not is string !")
+			return self.__wrong()
 		if  type(addr)!= int:
-			print("[x]wrong: func address not is int !")
-			return None
+			print("[\033[0;31;1mx\033[0m]wrong: func address not is int !")
+			return self.__wrong()
 		self.__fun_news['func']=func
 		self.__fun_news['addr']=addr
 		
@@ -51,20 +57,20 @@ class  finder(object):
 	                    			libcs.append(fname)
 		
 			if len(libcs)== 0:
-				print("[x]wrong: No matched, Make sure you supply a valid function name or add more libc in "+self.__libc_path)
-				return None
+				print("[\033[0;31;1mx\033[0m]wrong: No matched, Make sure you supply a valid function name or add more libc in \033[0;31;1m %s\033[0m"%(self.__libc_path))
+				return self.__wrong()
 			elif len(libcs)>1:
 				
-					print("multi libc results:")
+					print("[\033[0;32;1m*\033[0m]multi libc results:")
 					for x in range(len(libcs)):
 						with open(os.path.join(self.__libc_path,libcs[x].rstrip('.symbols')+'.info'), 'r') as f:
 							info=f.read().rstrip('\n')
-						print("[-]%2d: %s(source from:%s)" % (x,libcs[x].rstrip('.symbols'),info))
+						print("[-]%2d: \033[0;34;1m%s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (x,libcs[x].rstrip('.symbols'),info))
 					
 					while True:
 								try:	
 									if num==None:					
-										libcs_id = input("[!] you can choose it by hand\nOr type 'exit' to quit:")
+										libcs_id = input("[\033[0;33;1m!\033[0m] you can choose it by hand\nOr type 'exit' to quit:")
 										libcs_id = int(libcs_id)
 									else :
 										libcs_id=num
@@ -81,7 +87,7 @@ class  finder(object):
 										self.__bind(libcs)
 										with open(self.__libc_path.rstrip('.symbols')+'.info', 'r') as f:
 											info=f.read().rstrip('\n')
-											print("[+] %s baseaddr=%s (source from:%s)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
+											print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
 										break
 									except:
 											continue		
@@ -92,29 +98,30 @@ class  finder(object):
 				
 				with open(self.__libc_path.rstrip('.symbols')+'.info', 'r') as f:
 						info=f.read().rstrip('\n')
-				print("[*] %s baseaddr=%s (source from:%s)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
+				print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
 				
 	def ogg(self,level=0,num=None):
 		so_path=self.__libc_path.rstrip('.symbols')+'.so'
 		if os.path.exists(so_path)==False:
-			print("[x]wrong:don't find .so file in "+self.__libc_path)
-			return None
+			print("[\033[0;31;1mx\033[0m]wrong:don't find .so file in \033[0;31;1m %s\033[0m"%(self.__libc_path))
+			return self.__wrong()
 		else:
 			try:
 				x=subprocess.check_output(["one_gadget","--level",str(level),so_path])
 			
 			except FileNotFoundError:
-				print('[x]find out one_gadget')
-			
+				print('[\033[0;31;1mx\033[0m]find out one_gadget')
+				return self.__wrong()
 			else:
 				oggtext=x.decode().split('\n\n')
 				oggls=re.findall(r'0x[0-9A-F]+ ', x.decode(), re.I)
+				print("[\033[0;32;1m*\033[0m] multi one_gadget results:")
 				for i in range(len(oggls)):
-					print('[*]%2d: %s'%(i,oggtext[i]))
+					print('[-]%2d: \033[0;32;1m%s\033[0m %s'%(i,oggls[i],oggtext[i][len(oggls[i]):]))
 				while True:
 					try:
 						if num==None:
-							in_id = input("[!] you can choose a gadget by hand or type 'exit' to quit:")
+							in_id = input("[\033[0;33;1m!\033[0m] you can choose a gadget by hand or type 'exit' to quit:")
 							in_id = int(in_id)
 						else :
 							in_id=num
@@ -126,7 +133,7 @@ class  finder(object):
 					try:
 					    
 					    oggls = int(oggls[in_id],16)
-					    print('[*] you choose gadget: %s'%(hex(oggls)))
+					    print('[\033[0;32;1m+\033[0m] you choose gadget: \033[0;32;1m%s\033[0m'%(hex(oggls)))
 					    break
 					except:
 					    continue
@@ -144,3 +151,4 @@ if __name__ == "__main__":
 	print(x.symbols['read'])
 	#test('x')
 	#x.search()
+
