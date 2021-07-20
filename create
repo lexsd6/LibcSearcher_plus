@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo git clone https://github.com/niklasb/libc-database.git
+sudo git clone git://github.com/niklasb/libc-database.git
 #sudo apt-get install ruby2.6 ruby2.6-dev
 sudo gem install one_gadget
 sudo chmod 777 ./setup.py
