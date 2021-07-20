@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="libcfind",
-    version="1.3",
+    version="1.4",
     description="Improved Python wrapper for libc database.",
     author="lexsd6",
     author_email="lexsd6@foxmail.com",
