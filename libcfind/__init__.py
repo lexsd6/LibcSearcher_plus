@@ -2,7 +2,7 @@
 """
 Created on Mon Jul 19 21:11:32 2021
 
-@author: lexsd6
+@author: 冰之幻魄
 """
 
 import difflib
@@ -75,16 +75,17 @@ class  finder(object):
 					if any(map(lambda line: reconst.match(line), data)):
 	                    			libcs.append(fname)
 		
-			if len(libcs)== 0:
-				mean=[]
-				
+			if len(libcs)== 0:				
 				fnamekeys=libc_symbols.default_libc_symbols
-				mean=difflib.get_close_matches(self.__fun_news['func'],fnamekeys,12,0.4)
+				if fnamekeys.count(self.__fun_news['func'])==0:
+					mean=difflib.get_close_matches(self.__fun_news['func'],fnamekeys,12,0.4)
+				else:
+					mean=[]
 				if len(mean)==0:
 					print("[\033[0;31;1mx\033[0m] wrong: No matched, Make sure you supply a valid function name or add more libc in \033[0;31;1m %s\033[0m"%(self.__libc_path))
 					return self.__wrong()
 				else :
-					print("[\033[0;31;1mx\033[0m] wrong: No matched, Make sure you supply a valid function name ,did you mean:")
+					print("[\033[0;31;1mx\033[0m] wrong: No matched, Make sure you supply a valid function name ,may you mean:")
 					print(mean)
 					print("or add more libc in \033[0;31;1m %s\033[0m"%(self.__libc_path))
 					return self.__wrong()
