@@ -2,7 +2,7 @@
 """
 Created on Mon Jul 19 21:11:32 2021
 
-@author: 冰之幻魄
+@author: lexsd6
 """
 
 import difflib
@@ -93,9 +93,9 @@ class  finder(object):
 				
 					print("[\033[0;32;1m*\033[0m]multi libc results:")
 					for x in range(len(libcs)):
-						with open(os.path.join(self.__libc_path,libcs[x].rstrip('.symbols')+'.info'), 'r') as f:
+						with open(os.path.join(self.__libc_path,libcs[x].rstrip('symbols')+'info'), 'r') as f:
 							info=f.read().rstrip('\n')
-						print("[-]%2d: \033[0;34;1m%s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (x,libcs[x].rstrip('.symbols'),info))
+						print("[-]%2d: \033[0;34;1m%s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (x,libcs[x].rstrip('symbols')[:-1],info))
 					
 					while True:
 								try:	
@@ -115,9 +115,9 @@ class  finder(object):
 										libcs= libcs[libcs_id]
 										self.__libc_path=os.path.join(self.__libc_path,libcs)
 										self.__bind(libcs)
-										with open(self.__libc_path.rstrip('.symbols')+'.info', 'r') as f:
+										with open(self.__libc_path.rstrip('symbols')+'info', 'r') as f:
 											info=f.read().rstrip('\n')
-											print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
+											print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('symbols')[:-1],hex(self.libcbase),info))
 										break
 									except:
 											continue		
@@ -126,12 +126,12 @@ class  finder(object):
 				self.__libc_path=os.path.join(self.__libc_path,libcs)
 				self.__bind(libcs)
 				
-				with open(self.__libc_path.rstrip('.symbols')+'.info', 'r') as f:
+				with open(self.__libc_path.rstrip('symbols')+'info', 'r') as f:
 						info=f.read().rstrip('\n')
-				print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('.symbols'),hex(self.libcbase),info))
+				print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('symbols')[:-1],hex(self.libcbase),info))
 				
 	def ogg(self,level=0,num=None):
-		so_path=self.__libc_path.rstrip('.symbols')+'.so'
+		so_path=self.__libc_path.rstrip('symbols')[:-1]+'.so'
 		if os.path.exists(so_path)==False:
 			print("[\033[0;31;1mx\033[0m] wrong:don't find .so file in \033[0;31;1m %s\033[0m"%(self.__libc_path))
 			return self.__wrong()
