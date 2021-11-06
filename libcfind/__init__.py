@@ -2,7 +2,7 @@
 """
 Created on Mon Jul 19 21:11:32 2021
 
-@author: lexsd6
+@author: 冰之幻魄
 """
 
 import difflib
@@ -16,8 +16,23 @@ import libc_symbols
 
 class  finder(object):
 	def __init__(self,func=None, addr=None,num=None):
+		"""[summary]
+			Using  function name and  really addr to find remote environment libc.so
+
+		Args:
+			func ([string]): Function name to query.
+			addr ([int]): The real address of the function to query.
+			num ([int], optional): Select results,you can select results directly instead of manually . Defaults to None.
+		"""
 		self.symbols={}
-		self.libcbase=None
+		"""
+			[summary]
+			libc symbols addrs
+		"""
+		self.libcbase=0
+		"""
+			[summary]libc's base addr 
+		"""
 		self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
 		self.__fun_news=defaultdict(int)
 		self.__check(func,addr)
@@ -45,6 +60,14 @@ class  finder(object):
 		self.libcbase=self.__fun_news['addr']-self.symbols[self.__fun_news['func']]
 
 	def dump(self,func):
+		"""[summary]
+
+		Args:
+			func (str): function or symbol name 
+
+		Returns:
+			[int]: function or symbol really addr( symbol's addr + libc's base addr)
+		"""
 		if self.libcbase:
 			try:	
 				funcaddr=self.libcbase+self.symbols[func]
@@ -115,6 +138,7 @@ class  finder(object):
 										libcs= libcs[libcs_id]
 										self.__libc_path=os.path.join(self.__libc_path,libcs)
 										self.__bind(libcs)
+										self.so_path=self.__libc_path.rstrip('symbols')[:-1]+'.so'
 										with open(self.__libc_path.rstrip('symbols')+'info', 'r') as f:
 											info=f.read().rstrip('\n')
 											print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('symbols')[:-1],hex(self.libcbase),info))
@@ -125,12 +149,22 @@ class  finder(object):
 				libcs=libcs[0]
 				self.__libc_path=os.path.join(self.__libc_path,libcs)
 				self.__bind(libcs)
+				self.so_path=self.__libc_path.rstrip('symbols')[:-1]+'.so'
 				
 				with open(self.__libc_path.rstrip('symbols')+'info', 'r') as f:
 						info=f.read().rstrip('\n')
 				print("[\033[0;32;1m+\033[0m] choosing \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (libcs.rstrip('symbols')[:-1],hex(self.libcbase),info))
 				
 	def ogg(self,level=0,num=None):
+		"""[summary]
+
+		Args:
+			level (int, optional): chese one_gadget level. Defaults to 0.
+			num (int, optional): Select results,you can select results directly instead of manually . Defaults to None.
+
+		Returns:
+			[int]: one_gadget really addr(one_gadget result + libc's base addr)
+		"""
 		so_path=self.__libc_path.rstrip('symbols')[:-1]+'.so'
 		if os.path.exists(so_path)==False:
 			print("[\033[0;31;1mx\033[0m] wrong:don't find .so file in \033[0;31;1m %s\033[0m"%(self.__libc_path))
@@ -144,10 +178,12 @@ class  finder(object):
 				return self.__wrong()
 			else:
 				oggtext=x.decode().split('\n\n')
-				oggls=re.findall(r'0x[0-9A-F]+ ', x.decode(), re.I)
+				oggls=re.findall(r'0x[0-9A-F]+ e', x.decode(), re.I)
 				print("[\033[0;32;1m*\033[0m] multi one_gadget results:")
+				if len(oggls)!=len(oggtext):
+					print("[\033[0;31;1mx\033[0m] wrong: special libc ,please one_gadget by hand !")
 				for i in range(len(oggls)):
-					print('[-]%2d: \033[0;32;1m%s\033[0m %s'%(i,oggls[i],oggtext[i][len(oggls[i]):]))
+					print('[-]%2d: \033[0;32;1m%s\033[0m %s'%(i,oggls[i][:-1],oggtext[i][len(oggls[i])-1:]))
 				while True:
 					try:
 						if num==None:
@@ -162,7 +198,7 @@ class  finder(object):
 					    break
 					try:
 					    
-					    oggls = int(oggls[in_id],16)
+					    oggls = int(oggls[in_id][:-1],16)
 					    print('[\033[0;32;1m+\033[0m] you choose gadget: \033[0;32;1m%s\033[0m'%(hex(oggls)))
 					    break
 					except:
