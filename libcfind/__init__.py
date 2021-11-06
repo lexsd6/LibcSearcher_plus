@@ -2,7 +2,7 @@
 """
 Created on Mon Jul 19 21:11:32 2021
 
-@author: 冰之幻魄
+@author: lexsd6
 """
 
 import difflib
