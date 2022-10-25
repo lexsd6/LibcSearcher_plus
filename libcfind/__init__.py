@@ -12,7 +12,7 @@ import os
 import re
 import sys
 from psutil._compat import FileNotFoundError
-import libc_symbols
+import libcfind.libc_symbols as libc_symbols
 
 class  finder(object):
 	def __init__(self,func=None, addr=None,num=None):
@@ -210,9 +210,9 @@ class  finder(object):
 if __name__ == "__main__":
 	
 	x=finder('write',0xf7eb4c90,num=11)
-	x.ogg(num=0)
-	x.ogg(num=11)
-	print(x.dump('reade'))
+	#x.ogg(num=0)
+	#x.ogg(num=11)
+	#print(x.dump('reade'))
 	print(x.libcbase)
 	#print(x.sym['read'])
 	print(x.symbols['read'])
