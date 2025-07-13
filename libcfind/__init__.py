@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jul 19 21:11:32 2021
+Created on Mon Jul 19 21:11:32 2025
 
 @author: lexsd6
 """
@@ -13,9 +13,13 @@ import re
 import sys
 from psutil._compat import FileNotFoundError
 import libcfind.libc_symbols as libc_symbols
+from elftools.elf.elffile import ELFFile
+
+
+
 
 class  finder(object):
-	def __init__(self,func=None, addr=None,num=None):
+	def __init__(self,func=None, addr=None,num=None,path=None):
 		"""[summary]
 			Using  function name and  really addr to find remote environment libc.so
 
@@ -33,10 +37,15 @@ class  finder(object):
 		"""
 			[summary]libc's base addr 
 		"""
-		self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
+		
 		self.__fun_news=defaultdict(int)
 		self.__check(func,addr)
-		self.__search(num)
+		if path ==None:
+			self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
+			self.__search(num)
+		else:
+			self.__libc_path=os.path.normpath(path)
+			self.__local_libc(path)
 	def __wrong(self):
 		if hasattr(__import__('__main__'), '__file__'):
 			sys.exit(0)
@@ -58,7 +67,36 @@ class  finder(object):
 		with open(self.__libc_path, 'r') as f:
 			self.symbols=dict([i.strip('\n').split(' ')[0],int(i.strip('\n').split(' ')[-1],16)] for i in f.readlines())			
 		self.libcbase=self.__fun_news['addr']-self.symbols[self.__fun_news['func']]
+	def __local_libc(self,path):
+		with open(path, 'rb') as f:
+			elffile = ELFFile(f)
+        
+			
+			symtab = elffile.get_section_by_name('.symtab')  
+			dynsym = elffile.get_section_by_name('.dynsym')  
+			
+			
+			for sym_section in [symtab, dynsym]:
+			    if sym_section is None:
+			    	continue
+				
+			    
+			    strtab_index = sym_section['sh_link']
+			    strtab = elffile.get_section(strtab_index)
+			    
+			    
+			    for sym in sym_section.iter_symbols():
+			    	if sym['st_name'] == 0:
+			    		continue
+			    	try:
+			    		name = strtab.get_string(sym['st_name'])
+			    	except UnicodeDecodeError:
+			    		continue
+			    	self.symbols[name] = sym['st_value']
 
+			
+			self.libcbase=self.__fun_news['addr']-self.symbols[self.__fun_news['func']]
+			print("[\033[0;32;1m+\033[0m] loading \033[0;34;1m%s\033[0m \033[0;31;1mbaseaddr: %s\033[0m (source from:\033[0;33;1m%s\033[0m)" % (path,hex(self.libcbase),'local'))
 	def dump(self,func):
 		"""[summary]
 
@@ -165,7 +203,11 @@ class  finder(object):
 		Returns:
 			[int]: one_gadget really addr(one_gadget result + libc's base addr)
 		"""
-		so_path=self.__libc_path.rstrip('symbols')[:-1]+'.so'
+		so_path=self.__libc_path.rstrip('symbols')[:-1] #+'.so'
+		if  so_path.endswith('.so')==False:
+			so_path+='.so'
+		print(so_path)
+
 		if os.path.exists(so_path)==False:
 			print("[\033[0;31;1mx\033[0m] wrong:don't find .so file in \033[0;31;1m %s\033[0m"%(self.__libc_path))
 			return self.__wrong()
@@ -209,12 +251,11 @@ class  finder(object):
 
 if __name__ == "__main__":
 	
-	x=finder('write',0xf7eb4c90,num=11)
-	#x.ogg(num=0)
+	x=finder('write',0xf7eb4c90)
+	x.ogg(num=0)
 	#x.ogg(num=11)
-	#print(x.dump('reade'))
+	print(x.dump('read'))
 	print(x.libcbase)
-	#print(x.sym['read'])
 	print(x.symbols['read'])
 	#test('x')
 	#x.search()
