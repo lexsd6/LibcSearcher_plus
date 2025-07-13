@@ -85,6 +85,12 @@ finder('write',0xf7eb4c90,num=1)
 #优先自动选择标号为1的libc( 既实例上面中的libc6-amd64_2.27-3ubuntu1.2_i386(source from:ubuntu-glibc) )，
 来代替手动选择。若选取失败再手动选择。 
 ```
+2.0版新功能：
+```python
+
+finder('write',0xf7eb4c90,x=finder('write',0xf7eb4c90,path='/glibc/2.27/amd64/lib/libc-2.27.so'))
+#优先自动选择路径为/glibc/2.27/amd64/lib/libc-2.27.so的libc( 既实例上面中的libc6-amd64_2.27-3ubuntu1.2_i386(source from:ubuntu-glibc) )
+```
 
 ### 地址查询
 
