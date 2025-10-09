@@ -50,11 +50,11 @@ class  finder(object):
 		if path ==None:
 			self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
 			self.__search(num)
-			isLocal=False
+			self.isLocal=False
 		else:
 			self.__libc_path=os.path.abspath(path)
 			self.__local_libc(self.__libc_path)
-			isLocal=True
+			self.isLocal=True
 	def __wrong(self):
 		if hasattr(__import__('__main__'), '__file__'):
 			sys.exit(0)
@@ -144,7 +144,6 @@ class  finder(object):
 					data=f.read().rsplit('\n')
 					if any(map(lambda line: reconst.match(line), data)):
 	                    			libcs.append(fname)
-		
 			if len(libcs)== 0:				
 				fnamekeys=libc_symbols.default_libc_symbols
 				if fnamekeys.count(self.__fun_news['func'])==0:
