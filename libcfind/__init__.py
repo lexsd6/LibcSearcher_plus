@@ -19,6 +19,13 @@ from elftools.elf.elffile import ELFFile
 
 
 class  finder(object):
+	"""[summary]
+		Using  function name and  really addr to find remote environment libc.so
+		Then you can use dump(func) to get the really addr of func in remote environment libc.so
+		You can also use ogg() to get one_gadget addr in remote environment libc.so
+		You can also use local libc.so to init finder
+	"""
+	isLocal=False
 	def __init__(self,func=None, addr=None,num=None,path=None):
 		"""[summary]
 			Using  function name and  really addr to find remote environment libc.so
@@ -43,9 +50,11 @@ class  finder(object):
 		if path ==None:
 			self.__libc_path=os.path.normpath(os.path.join(os.path.realpath(os.path.dirname(__file__)), "../libc-database/db/"))
 			self.__search(num)
+			self.isLocal=False
 		else:
-			self.__libc_path=os.path.normpath(path)
-			self.__local_libc(path)
+			self.__libc_path=os.path.abspath(path)
+			self.__local_libc(self.__libc_path)
+			self.isLocal=True
 	def __wrong(self):
 		if hasattr(__import__('__main__'), '__file__'):
 			sys.exit(0)
@@ -135,7 +144,6 @@ class  finder(object):
 					data=f.read().rsplit('\n')
 					if any(map(lambda line: reconst.match(line), data)):
 	                    			libcs.append(fname)
-		
 			if len(libcs)== 0:				
 				fnamekeys=libc_symbols.default_libc_symbols
 				if fnamekeys.count(self.__fun_news['func'])==0:
@@ -203,9 +211,12 @@ class  finder(object):
 		Returns:
 			[int]: one_gadget really addr(one_gadget result + libc's base addr)
 		"""
-		so_path=self.__libc_path.rstrip('symbols')[:-1] #+'.so'
-		if  so_path.endswith('.so')==False:
-			so_path+='.so'
+		if self.isLocal:
+			so_path=self.__libc_path.rstrip('symbols')[:-1]
+			if so_path.endswith('.so')==False:
+				so_path=so_path+'.so'
+		else:
+			so_path=self.__libc_path
 		print(so_path)
 
 		if os.path.exists(so_path)==False:
