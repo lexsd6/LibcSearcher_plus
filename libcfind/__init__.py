@@ -212,11 +212,11 @@ class  finder(object):
 			[int]: one_gadget really addr(one_gadget result + libc's base addr)
 		"""
 		if self.isLocal:
+			so_path=self.__libc_path
+		else:
 			so_path=self.__libc_path.rstrip('symbols')[:-1]
 			if so_path.endswith('.so')==False:
 				so_path=so_path+'.so'
-		else:
-			so_path=self.__libc_path
 		print(so_path)
 
 		if os.path.exists(so_path)==False:
