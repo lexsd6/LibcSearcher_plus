@@ -1,0 +1,5 @@
+build
+libc-database
+libcfind.egg-info
+libcfind/__pycache__
+
